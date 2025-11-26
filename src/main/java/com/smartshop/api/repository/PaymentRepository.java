@@ -20,7 +20,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     List<Payment> findByOrderIdAndStatut(Long orderId, PaymentStatus statut);
 
-    List<Payment> findByPaymentMethod(PaymentMethod paymentMethod);
+    List<Payment> findByMethodePaiement(PaymentMethod methodePaiement);
 
     // calculate totale paid for an order
 
@@ -28,7 +28,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT COALESCE(SUM(p.montant), 0.0) FROM Payment p WHERE p.order.id = :orderId AND p.statut = 'ENCAISSE'")
     Double sumTotalPaidByOrderId(Long orderId);
 
-    List<Payment> findByOrderIdAndPaymentMethod(Long orderId, PaymentMethod paymentMethod);
+    List<Payment> findByOrderIdAndMethodePaiement(Long orderId, PaymentMethod methodePaiement);
 
     List<Payment> findByStatutAndDateEcheance(PaymentStatus statut, LocalDate dateEcheance);
 

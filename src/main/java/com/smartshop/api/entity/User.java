@@ -2,6 +2,7 @@ package com.smartshop.api.entity;
 
 import com.smartshop.api.enums.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Email(message = "Invalid email format")
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
