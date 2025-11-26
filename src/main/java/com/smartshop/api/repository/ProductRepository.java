@@ -6,10 +6,13 @@ import com.smartshop.api.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+@Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Find all orders for a specific client (for order history)
