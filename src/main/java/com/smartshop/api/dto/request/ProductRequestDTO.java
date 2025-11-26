@@ -2,10 +2,18 @@ package com.smartshop.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductRequestDTO {
+
+    private Long id;
 
     @NotBlank(message = "Le nom du produit est obligatoire")
     private String nom;
@@ -14,12 +22,10 @@ public class ProductRequestDTO {
     private String description;
 
     @Positive(message = "Le prix unitaire doit être un nombre positif")
-    @NotBlank(message = "Le prix unitaire du produit est obligatoire")
     private Double prixUnitaire;
 
 
     @Positive
-    @NotBlank(message = "Le stock du produit est obligatoire")
     private Integer stock;
 
 

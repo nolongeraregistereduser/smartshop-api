@@ -54,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
                         .build());
     }
 
+    @Transactional
     @Override
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO productRequestDTO) {
         Product product = productRepository.findById(id)
