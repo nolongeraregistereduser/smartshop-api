@@ -35,13 +35,13 @@ public class ClientServiceImpl implements ClientService {
         }
 
         // Check if username already exists
-        if (userRepository.existsByUsername(clientRequestDTO.getUsername())) {
+        if (userRepository.existsByEmail(clientRequestDTO.getEmail())) {
             throw new DuplicateResourceException("Ce nom d'utilisateur existe déjà");
         }
 
         // Create User first
         User user = User.builder()
-                .username(clientRequestDTO.getUsername())
+                .email(clientRequestDTO.getEmail())
                 .password(passwordEncoder.encode(clientRequestDTO.getPassword()))
                 .role(UserRole.CLIENT)
                 .build();
