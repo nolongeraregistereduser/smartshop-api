@@ -2,7 +2,9 @@ package com.smartshop.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import lombok.Data;
 
+@Data
 public class ProductRequestDTO {
 
     @NotBlank(message = "Le nom du produit est obligatoire")

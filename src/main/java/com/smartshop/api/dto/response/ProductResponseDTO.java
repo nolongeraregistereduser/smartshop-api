@@ -1,7 +1,12 @@
 package com.smartshop.api.dto.response;
 
+import lombok.Builder;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
+@Data
+@Builder
 public class ProductResponseDTO {
 
     private Long id;
