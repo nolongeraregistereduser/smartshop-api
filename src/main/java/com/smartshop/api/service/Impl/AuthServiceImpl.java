@@ -2,23 +2,26 @@ package com.smartshop.api.service.Impl;
 
 import com.smartshop.api.dto.request.LoginRequestDTO;
 import com.smartshop.api.dto.response.LoginResponseDTO;
+import com.smartshop.api.entity.User;
 import com.smartshop.api.enums.UserRole;
 import com.smartshop.api.repository.UserRepository;
 import com.smartshop.api.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 @Service
 @RequiredArgsConstructor
-
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String SESSION_USER_ID = "SESSION_USER_ID";
     private static final String SESSION_USER_ROLE = "SESSION_USER_ROLE";
+
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO, HttpSession session) {
         String email = loginRequestDTO.getEmail();
@@ -30,24 +33,23 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
-        if (!userRepository.findByEmail(email).get().getPassword().equals(password)) {
+        User user = userRepository.findByEmail(email).get();
+
+        // Use BCrypt to verify password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             return LoginResponseDTO.builder()
                     .message("Invalid email or password")
                     .build();
         }
 
-        // strong user id and role in session
-
-        Long userId = userRepository.findByEmail(email).get().getId();
-        UserRole role = userRepository.findByEmail(email).get().getRole();
-
-        session.setAttribute(SESSION_USER_ID, userId);
-        session.setAttribute(SESSION_USER_ROLE, role);
+        // Store user id and role in session
+        session.setAttribute(SESSION_USER_ID, user.getId());
+        session.setAttribute(SESSION_USER_ROLE, user.getRole());
 
         return LoginResponseDTO.builder()
-                .userId(userId)
+                .userId(user.getId())
                 .email(email)
-                .role(role)
+                .role(user.getRole())
                 .message("Login successful")
                 .build();
     }

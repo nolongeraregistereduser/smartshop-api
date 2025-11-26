@@ -9,6 +9,7 @@ import com.smartshop.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -29,7 +31,7 @@ public class DataInitializer implements CommandLineRunner {
             // Create Admin User
             User adminUser = User.builder()
                     .email("mohamed@admin.com")
-                    .password("123456789")
+                    .password(passwordEncoder.encode("123456789"))
                     .role(UserRole.ADMIN)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
@@ -40,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
             // Create Client User 1
             User clientUser1 = User.builder()
                     .email("mohamed@client.com")
-                    .password("123456789")
+                    .password(passwordEncoder.encode("123456789"))
                     .role(UserRole.CLIENT)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
@@ -65,7 +67,7 @@ public class DataInitializer implements CommandLineRunner {
             // Create Client User 2
             User clientUser2 = User.builder()
                     .email("mohamed2@client.com")
-                    .password("123456789")
+                    .password(passwordEncoder.encode("123456789"))
                     .role(UserRole.CLIENT)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
@@ -90,7 +92,7 @@ public class DataInitializer implements CommandLineRunner {
             // Create Client User 3
             User clientUser3 = User.builder()
                     .email("mohamed3@client.com")
-                    .password("123456789")
+                    .password(passwordEncoder.encode("123456789"))
                     .role(UserRole.CLIENT)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
