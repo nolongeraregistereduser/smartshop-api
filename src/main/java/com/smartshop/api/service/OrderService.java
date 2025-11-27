@@ -1,6 +1,7 @@
 package com.smartshop.api.service;
 
 import com.smartshop.api.dto.request.OrderRequestDTO;
+import com.smartshop.api.dto.response.OrderHistoryDTO;
 import com.smartshop.api.dto.response.OrderResponseDTO;
 
 import java.util.List;
@@ -16,6 +17,10 @@ public interface OrderService {
     // get all orders for admin
 
     List<OrderResponseDTO> getAllOrders();
+
+    // get client order history (for specific client)
+
+    List<OrderHistoryDTO> getClientOrderHistory(Long clientId);
 
     // confirm order
 

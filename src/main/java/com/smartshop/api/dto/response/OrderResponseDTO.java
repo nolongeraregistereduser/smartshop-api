@@ -1,5 +1,6 @@
 package com.smartshop.api.dto.response;
 
+import com.smartshop.api.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class OrderResponseDTO {
     private Double montantRestant;
     private String CodePromo;
     private boolean promoApplied;
-    private String status;
+    private OrderStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

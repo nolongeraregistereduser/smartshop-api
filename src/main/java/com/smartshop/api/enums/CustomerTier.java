@@ -25,5 +25,12 @@ public enum CustomerTier {
     public boolean isEligibleForDiscount(double orderSubtotal) {
         return orderSubtotal >= minimumOrderAmount;
     }
+
+    public double calculateDiscount(double sousTotal) {
+        if (isEligibleForDiscount(sousTotal)) {
+            return sousTotal * discountRate;
+        }
+        return 0.0;
+    }
 }
 
