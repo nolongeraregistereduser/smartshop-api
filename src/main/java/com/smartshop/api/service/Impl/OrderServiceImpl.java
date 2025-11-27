@@ -145,7 +145,8 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponseDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
-        // Convert all orders to DTOs using Stream API
+        // returning orders
+
         return orders.stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
