@@ -17,6 +17,7 @@ import com.smartshop.api.exception.ResourceNotFoundException;
 import com.smartshop.api.repository.ClientRepository;
 import com.smartshop.api.repository.OrderRepository;
 import com.smartshop.api.repository.ProductRepository;
+import com.smartshop.api.repository.PaymentRepository;
 import com.smartshop.api.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.Data;
@@ -40,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
+    private final PaymentRepository paymentRepository;
     @Override
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDTO) {
 
@@ -181,6 +183,11 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessRuleViolationException(
                     "Only PENDING orders can be confirmed. Current status: " + order.getStatus());
         }
+
+        // Recompute remaining from paid
+        double paidSoFar = paymentRepository.sumTotalPaidByOrderId(id) != null ? paymentRepository.sumTotalPaidByOrderId(id) : 0.0;
+        double newRemaining = round((order.getTotalTTC() - paidSoFar) * 100.0) / 100.0;
+        order.setMontantRestant(newRemaining);
 
         if (order.getMontantRestant() > 0.01) { // Small tolerance for floating point
             throw new BusinessRuleViolationException(

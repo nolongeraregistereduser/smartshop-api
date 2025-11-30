@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 
 public class PaymentRequestDTO {
 
-    private String orderId;
     private Double montant;
     private PaymentMethod paymentMethod;
     private String reference;
