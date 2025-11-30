@@ -41,8 +41,8 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessRuleViolationException("Cannot add payment to a final order with status: " + order.getStatus());
         }
 
-        double paidSoFar = paymentRepository.sumTotalPaidByOrderId(orderId) != null ? paymentRepository.sumTotalPaidByOrderId(orderId) : 0.0;
-        double remaining = round2(order.getTotalTTC() - paidSoFar);
+        // Use order.montantRestant as the authoritative remaining amount
+        double remaining = round2(order.getMontantRestant() != null ? order.getMontantRestant() : order.getTotalTTC());
 
         if (requestDTO.getMontant() == null || requestDTO.getMontant() <= 0) {
             throw new BusinessRuleViolationException("Montant du paiement invalide");
@@ -116,10 +116,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment saved = paymentRepository.save(payment);
 
-        // If encaisse, update order.montantRestant
+        // If encaisse, update order.montantRestant by subtracting the saved payment montant
         if (saved.getStatut() == PaymentStatus.ENCAISSE) {
-            double newPaid = paymentRepository.sumTotalPaidByOrderId(orderId) != null ? paymentRepository.sumTotalPaidByOrderId(orderId) : 0.0;
-            double newRemaining = round2(order.getTotalTTC() - newPaid);
+            double newRemaining = round2(order.getMontantRestant() - saved.getMontant());
+            if (newRemaining < 0) newRemaining = 0.0;
             order.setMontantRestant(newRemaining);
             orderRepository.save(order);
         }
@@ -152,18 +152,21 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessRuleViolationException("Payment is already encaisse");
         }
 
+        boolean wasEncaisse = payment.getStatut() == PaymentStatus.ENCAISSE;
+
         payment.setStatut(PaymentStatus.ENCAISSE);
         payment.setDateEncaissement(LocalDateTime.now());
         Payment saved = paymentRepository.save(payment);
 
-        // Update order remaining
-        double newPaid = paymentRepository.sumTotalPaidByOrderId(orderId) != null ? paymentRepository.sumTotalPaidByOrderId(orderId) : 0.0;
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-
-        double newRemaining = round2(order.getTotalTTC() - newPaid);
-        order.setMontantRestant(newRemaining);
-        orderRepository.save(order);
+        // Update order remaining by subtracting the payment montant (only if it wasn't encaisse before)
+        if (!wasEncaisse) {
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+            double newRemaining = round2(order.getMontantRestant() - saved.getMontant());
+            if (newRemaining < 0) newRemaining = 0.0;
+            order.setMontantRestant(newRemaining);
+            orderRepository.save(order);
+        }
 
         return convertToDTO(saved);
     }
@@ -186,12 +189,11 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatut(PaymentStatus.REJETE);
         Payment saved = paymentRepository.save(payment);
 
-        // If payment was ENCAISSE before, we need to update order remaining
+        // If payment was ENCAISSE before, we need to update order remaining by adding back the amount
         if (wasEncaisse) {
-            double newPaid = paymentRepository.sumTotalPaidByOrderId(orderId) != null ? paymentRepository.sumTotalPaidByOrderId(orderId) : 0.0;
             Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-            double newRemaining = round2(order.getTotalTTC() - newPaid);
+            double newRemaining = round2(order.getMontantRestant() + saved.getMontant());
             order.setMontantRestant(newRemaining);
             orderRepository.save(order);
         }
